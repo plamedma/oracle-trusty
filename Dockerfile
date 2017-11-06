@@ -2,9 +2,7 @@
 FROM ubuntu:trusty
 MAINTAINER Leandro Ramos <lramos@ascentio.com.ar>
 
-ENV ORACLE_VERSION 11.2.0.4.0-2
-ENV ORACLE_VERSION_SHORT 11.2
-EXPOSE 1521 # database port
+EXPOSE 1521
 EXPOSE 22
 
 # Install basic dependencies
@@ -16,9 +14,10 @@ RUN apt-get update -y && apt-get install -y \
     python-numpy \
     python \
     python-pip \
+    libaio-dev
 
 # Installing python dependencies
-RUN pip install
+RUN pip install cx-Oracle==6.0.2
 
 # Set up environment
 EXPOSE 1521
@@ -27,11 +26,11 @@ EXPOSE 22
 ADD resources /resources
 WORKDIR /resources
 
-RUN sudo dpkg -i oracle-instantclient$ORACLE_VERSION_SHORT-basic_$ORACLE_VERSION_amd64.deb
-RUN sudo dpkg -i oracle-instantclient$ORACLE_VERSION-sqlplus_$ORACLE_VERSION_amd64.deb
+RUN sudo dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+RUN sudo dpkg -i oracle-instantclient11.2-sqlplus_11.2.0.4.0-2_amd64.deb
 RUN sudo cp 60-oracle.conf /etc/sysctl.d/
 RUN sudo service procps start
 RUN sudo ldconfig
-ENV ORACLE_HOME=/usr/lib/oracle/$ORACLE_VERSION/client64/
+ENV ORACLE_HOME=/usr/lib/oracle/11.2/client64/
 ENV LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
 ENV PATH=$ORACLE_HOME/bin:$PATH
